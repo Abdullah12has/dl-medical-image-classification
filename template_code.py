@@ -18,7 +18,7 @@ from tqdm import tqdm
 batch_size = 24
 num_classes = 5  # 5 DR levels
 learning_rate = 0.0001
-num_epochs = 20
+num_epochs = 10
 
 
 class RetinopathyDataset(Dataset):
@@ -330,11 +330,11 @@ class MyModel(nn.Module):
     def __init__(self, num_classes=5, dropout_rate=0.5):
         super().__init__()
 
-        self.backbone = models.resnet18(pretrained=True)
+        self.backbone = models.vgg16(pretrained=True)
         self.backbone.fc = nn.Identity()  # Remove the original classification layer
 
         self.fc = nn.Sequential(
-            nn.Linear(512, 256),
+            nn.Linear(512 * 7 * 7, 256),
             nn.ReLU(inplace=True),
             nn.Dropout(p=dropout_rate),
             nn.Linear(256, 128),
@@ -344,7 +344,8 @@ class MyModel(nn.Module):
         )
 
     def forward(self, x):
-        x = self.backbone(x)
+        x = self.backbone.features(x)
+        x = torch.flatten(x, 1) 
         x = self.fc(x)
         return x
 
@@ -353,7 +354,7 @@ class MyDualModel(nn.Module):
     def __init__(self, num_classes=5, dropout_rate=0.5):
         super().__init__()
 
-        backbone = models.resnet18(pretrained=True)
+        backbone = models.vgg16(init_weights=True)
         backbone.fc = nn.Identity()
 
         # Here the two backbones will have the same structure but unshared weights
@@ -361,7 +362,7 @@ class MyDualModel(nn.Module):
         self.backbone2 = copy.deepcopy(backbone)
 
         self.fc = nn.Sequential(
-            nn.Linear(512 * 2, 256),
+            nn.Linear(512 * 7 * 7 * 2 , 256),
             nn.ReLU(inplace=True),
             nn.Dropout(p=dropout_rate),
             nn.Linear(256, 128),
@@ -373,9 +374,11 @@ class MyDualModel(nn.Module):
     def forward(self, images):
         image1, image2 = images
 
-        x1 = self.backbone1(image1)
-        x2 = self.backbone2(image2)
+        x1 = self.backbone1.features(image1)
+        x2 = self.backbone2.features(image2)
 
+        x1 = torch.flatten(x1, start_dim=1) 
+        x2 = torch.flatten(x2, start_dim=1)
         x = torch.cat((x1, x2), dim=1)
         x = self.fc(x)
         return x
@@ -385,8 +388,9 @@ if __name__ == '__main__':
     # Choose between 'single image' and 'dual images' pipeline
     # This will affect the model definition, dataset pipeline, training and evaluation
 
-    mode = 'single'  # forward single image to the model each time
-    # mode = 'dual'  # forward two images of the same eye to the model and fuse the features
+    #TODO: change mode here
+    # mode = 'single'  # forward single image to the model each time 
+    mode = 'dual'  # forward two images of the same eye to the model and fuse the features
 
     assert mode in ('single', 'dual')
 
