@@ -13,12 +13,15 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import models, transforms
 from torchvision.transforms.functional import to_pil_image
 from tqdm import tqdm
+import cv2
+from PIL import Image, ImageEnhance
+from torchvision.transforms.functional import to_tensor
 
 # Hyper Parameters
 batch_size = 24
 num_classes = 5  # 5 DR levels
 learning_rate = 0.0001
-num_epochs = 10
+num_epochs = 20
 
 
 class RetinopathyDataset(Dataset):
@@ -225,10 +228,11 @@ transform_train = transforms.Compose([
     transforms.RandomHorizontalFlip(p=0.5),
     transforms.RandomVerticalFlip(p=0.5),
     transforms.ColorJitter(brightness=(0.1, 0.9)),
+    # part d
     CLAHETransform(),  # CLAHE
-    GaussianBlurTransform(),  # Gaussian Blur
-    SharpeningTransform(),  # Sharpening
-    CircleCropTransform(),  # Circle Cropping
+    # GaussianBlurTransform(),  # Gaussian Blur
+    # SharpeningTransform(),  # Sharpening
+    # CircleCropTransform(),  # Circle Cropping
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
