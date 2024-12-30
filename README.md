@@ -144,7 +144,7 @@ Recall: 0.6525
 
 
 
-On test cases: 
+ ## On test cases: 
 
 Bagging: 79.60
 Boosting: 78.61
@@ -152,13 +152,35 @@ Max_voting: 85.28
 Stacking: 79.52
 Weighted Predictions: 84.66 
 
-
 The base models used for this had the following results on the test case:
 
 
 Resnet18: 83.91%
 Resnet34: 78.73%
 VGG16: 84.17%
+
+
+
+Part d-2: 
+Image augmentation techniques
+
+Base model: VGG16 with spacial attention and unfrozen layers
+
+Performance: 83.58.
+
+Will try:
+Ben  Graham,  Circle  Cropping, CLAHE, adding gaussian blur, sharpening up the images to see difference on results
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -222,8 +244,6 @@ Since the hybrid approach is working better, we will only apply that to resnet 3
 Increased the batch size to 34: because it was giving better results
 
 
-
-
 # Stacking
 
 
@@ -274,4 +294,6 @@ Test Results: 0.8282
 1. CONFIG={'models':{'vgg16':False,'resnet18':False,'resnet34':True},'ensemble_methods':{'stacking':False,'boosting':False,'weighted_average':False,'max_voting':True,'bagging':False},'preprocessing':{'ben_graham':True,'circle_crop':True,'clahe':True,'gaussian_blur':True,'sharpen':True}}
 2. Training Best Kappa: 
 3. Kaggle Score: 78,84
+
+
 

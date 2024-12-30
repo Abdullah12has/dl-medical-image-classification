@@ -133,6 +133,20 @@ class CutOut(object):
         return img
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class SLORandomPad:
     def __init__(self, size):
         self.size = size
