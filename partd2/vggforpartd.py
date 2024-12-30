@@ -135,7 +135,51 @@ class CutOut(object):
 
 
 
+class CLAHETransform:
+    """Apply CLAHE (Contrast Limited Adaptive Histogram Equalization) to images."""
+    def __call__(self, img):
+        # Convert PIL Image to NumPy array
+        img_np = np.array(img)
+        if len(img_np.shape) == 3:  # RGB Image
+            lab = cv2.cvtColor(img_np, cv2.COLOR_RGB2LAB)
+            l, a, b = cv2.split(lab)
+            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+            cl = clahe.apply(l)
+            lab = cv2.merge((cl, a, b))
+            img_np = cv2.cvtColor(lab, cv2.COLOR_LAB2RGB)
+        else:  # Grayscale Image
+            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+            img_np = clahe.apply(img_np)
+        return Image.fromarray(img_np)
 
+class GaussianBlurTransform:
+    """Apply Gaussian Blur to images."""
+    def __call__(self, img):
+        img_np = np.array(img)
+        blurred = cv2.GaussianBlur(img_np, (5, 5), 0)  # Kernel size (5x5)
+        return Image.fromarray(blurred)
+
+class SharpeningTransform:
+    """Sharpen the image."""
+    def __call__(self, img):
+        img_np = np.array(img)
+        kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])  # Sharpening kernel
+        sharpened = cv2.filter2D(img_np, -1, kernel)
+        return Image.fromarray(sharpened)
+
+class CircleCropTransform:
+    """Perform Ben Graham's circle cropping."""
+    def __call__(self, img):
+        img_np = np.array(img)
+        h, w, _ = img_np.shape
+        mask = np.zeros((h, w), dtype=np.uint8)
+        center = (w // 2, h // 2)
+        radius = min(h, w) // 2
+        cv2.circle(mask, center, radius, 255, -1)
+        masked = cv2.bitwise_and(img_np, img_np, mask=mask)
+        x, y, r = center[0] - radius, center[1] - radius, radius * 2
+        cropped = masked[y:y + r, x:x + r]
+        return Image.fromarray(cropped)
 
 
 
@@ -181,6 +225,10 @@ transform_train = transforms.Compose([
     transforms.RandomHorizontalFlip(p=0.5),
     transforms.RandomVerticalFlip(p=0.5),
     transforms.ColorJitter(brightness=(0.1, 0.9)),
+    CLAHETransform(),  # CLAHE
+    GaussianBlurTransform(),  # Gaussian Blur
+    SharpeningTransform(),  # Sharpening
+    CircleCropTransform(),  # Circle Cropping
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
