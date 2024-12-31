@@ -33,7 +33,6 @@ datasets/
 checkpoints/
 *.ckpt
 *.h5
-*.pth
 *.onnx
 
 # Logs and debug files
