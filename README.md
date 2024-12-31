@@ -166,13 +166,16 @@ Image augmentation techniques
 
 Base model: VGG16 with spacial attention and unfrozen layers
 
-Performance: 83.58.
+BASE MODEL Performance: 83.58.
 
 Will try:
 Ben  Graham,  Circle  Cropping, CLAHE, adding gaussian blur, sharpening up the images to see difference on results
 
-
-
+SharpeningTransform():79.93
+gaussian blur: 80.10
+CLAHETransform:83.82
+Circle Crop Transform: 82.59
+All: 
 
 
 
