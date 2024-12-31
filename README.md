@@ -171,11 +171,16 @@ BASE MODEL Performance: 83.58.
 Will try:
 Ben  Graham,  Circle  Cropping, CLAHE, adding gaussian blur, sharpening up the images to see difference on results
 
+ben Graham: 28.49 really bad
 SharpeningTransform():79.93
 gaussian blur: 80.10
 CLAHETransform:83.82
 Circle Crop Transform: 82.59
-All: 
+All: 84.29
+
+applying all improved...
+
+removing sharpening, and gaussian blur and trying again: 81.70
 
 
 
